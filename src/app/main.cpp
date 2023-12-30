@@ -2,7 +2,7 @@
 #include <extensionsystem/pluginmanager.h>
 #include <extensionsystem/pluginspec.h>
 #include "../plugins/helloworld/helloservice.h"
-
+#include "../plugins/myPlugin/hellomyservice.h"
 #include <QCoreApplication>
 #include <QFileInfo>
 
@@ -163,6 +163,9 @@ int main(int argc, char **argv)
     if (helloService != nullptr)
         helloService->sayHello();
 
+    HelloMyPlugin::Service *helloServiceOther = PluginManager::getObject<HelloMyPlugin::Service>();
+    if (helloServiceOther != nullptr)
+        helloServiceOther->sayHello();
 
 //    // Set up remote arguments.
 //    QObject::connect(&app, &SharedTools::QtSingleApplication::messageReceived,
