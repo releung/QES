@@ -92,12 +92,16 @@ int main(int argc, char **argv)
 
     const QStringList pluginArguments = app.arguments();
 
+    // 设置插件目录. 并解析出符合的插件信息
     QString pluginPath = QCoreApplication::applicationDirPath() + "/plugins/";
 
     PluginManager pluginManager;
     PluginManager::setPluginIID(QLatin1String("waleon.blog.csdn.net.qesplugin"));
     PluginManager::setPluginPaths(QStringList() << pluginPath);
 
+    qDebug() << "pluginArguments" << pluginArguments << pluginArguments.size();
+
+    // 处理命令行参数
     QMap<QString, QString> foundAppOptions;
     if (pluginArguments.size() > 1) {
         QMap<QString, bool> appOptions;
@@ -113,11 +117,14 @@ int main(int argc, char **argv)
         }
     }
 
+    // 获取之前解析出的所有插件信息
     const QList<PluginSpec *> plugins = PluginManager::plugins();
     PluginSpec *coreplugin = nullptr;
 
+    // 打印所有插件信息
     printSpecs(plugins);
 
+    // 查找 Core 插件
     foreach (PluginSpec *spec, plugins) {
         if (spec->name() == QLatin1String(corePluginNameC)) {
             coreplugin = spec;
@@ -140,11 +147,13 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    // 命令行 -version 处理
     if (foundAppOptions.contains(QLatin1String(VERSION_OPTION))) {
         printVersion(coreplugin);
         return 0;
     }
 
+    // 命令行 -h -help /h --help 处理
     if (foundAppOptions.contains(QLatin1String(HELP_OPTION1))
             || foundAppOptions.contains(QLatin1String(HELP_OPTION2))
             || foundAppOptions.contains(QLatin1String(HELP_OPTION3))
@@ -153,19 +162,28 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    // 加载之前查询到的所有插件
+    qDebug() << "\nstart load plugins >>>>>>>>>>>>>>>>>>>>>>";
     PluginManager::loadPlugins();
     if (coreplugin->hasError()) {
         qWarning() << "Failed to load core:" << coreplugin->errorString();
         return 1;
     }
+    qDebug() << "done load plugins >>>>>>>>>>>>>>>>>>>>>>\n";
 
+    // 获取 Hello 插件的实例
+    qDebug() << "\nget Hello plugin instance";
     Hello::Service *helloService = PluginManager::getObject<Hello::Service>();
     if (helloService != nullptr)
         helloService->sayHello();
 
+    // 获取 HelloMyPlugin 插件的实例
+    qDebug() << "\nget HelloMyPlugin plugin instance";
     HelloMyPlugin::Service *helloServiceOther = PluginManager::getObject<HelloMyPlugin::Service>();
     if (helloServiceOther != nullptr)
         helloServiceOther->sayHello();
+
+    qDebug() << "\nget xx plugin instance done <<<<<<<<<\n";
 
 //    // Set up remote arguments.
 //    QObject::connect(&app, &SharedTools::QtSingleApplication::messageReceived,
