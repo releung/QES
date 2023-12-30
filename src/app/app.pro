@@ -10,8 +10,11 @@ INCLUDEPATH += \
     $$PWD/../plugins/
 
 CONFIG(debug, debug|release){
+    LIBS += -L$$OUT_PWD/../../3rdparty/utils/debug/ -lutils
     LIBS += -L$$OUT_PWD/../../3rdparty/extensionsystem/debug/ -lextensionsystem
+
 } else {
+    LIBS += -L$$OUT_PWD/../../3rdparty/utils/release/ -lutils
     LIBS += -L$$OUT_PWD/../../3rdparty/extensionsystem/release/ -lextensionsystem
 }
 
